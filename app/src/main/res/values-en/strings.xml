@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PaginasAmarillas</string>
+    <string name="correo_electronico">Email</string>
+    <string name="bienvenido_a_p_ginas_amarillas">Welcome to Páginas Amarillas</string>
+    <string name="password">Password</string>
+    <string name="iniciar_sesi_n">Login</string>
+</resources>
