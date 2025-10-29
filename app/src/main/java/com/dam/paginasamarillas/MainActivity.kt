@@ -5,49 +5,32 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicSecureTextField
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.TextObfuscationMode
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dam.paginasamarillas.ui.theme.PaginasAmarillasTheme
 
@@ -56,24 +39,35 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            PaginasAmarillasTheme {
+                // 1. Lógica de navegación principal
+                var showLoginScreen by rememberSaveable { mutableStateOf(true) }
 
-            login();
+                if (showLoginScreen) {
+                    LoginScreen(onRegisterClick = { showLoginScreen = false })
+                } else {
+                    RegistroScreen(onBackToLogin = { showLoginScreen = true })
+                }
+            }
         }
     }
 }
 
 @Composable
-fun login(){
+fun LoginScreen(onRegisterClick: () -> Unit) {
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    // Estados para los campos de texto. Usamos rememberSaveable para sobrevivir a giros de pantalla.
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var showPassword by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-    ){
+    ) {
         Image(
             painter = painterResource(R.drawable.logo),
             contentDescription = "Logo de un pulpo amarillo con herramientas dentro de una casa",
@@ -83,75 +77,64 @@ fun login(){
             contentScale = ContentScale.Crop
         )
 
-        Spacer(
-            modifier = Modifier
-                .height(32.dp)
-        )
+        Spacer(modifier = Modifier.height(32.dp))
 
+        // --- Campo de texto para el Email ---
         OutlinedTextField(
             value = email,
-            onValueChange = {email = it},
-            label = {Text(stringResource(id = R.string.correo_electronico))},
+            onValueChange = { email = it },
+            label = { Text(stringResource(id = R.string.correo_electronico)) },
             singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(
-            modifier = Modifier
-                .height(16.dp)
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
-        val state = remember { TextFieldState() };
-        var showPassword by remember { mutableStateOf(false) };
-
-        BasicSecureTextField(
-            label = {Text(stringResource(id = R.string.password))},
-            state = state,
-            textObfuscationMode =
-                if(showPassword) {
-                    TextObfuscationMode.Visible
-                } else {
-                    TextObfuscationMode.RevealLastTyped
-                },
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-
+        // --- Campo de texto para la Contraseña con OutlinedTextField ---
         OutlinedTextField(
             value = password,
-            onValueChange = {password = it},
-            label = {Text(stringResource(id = R.string.password))},
+            onValueChange = { password = it },
+            label = { Text(stringResource(id = R.string.password)) },
             singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            // Oculta o muestra el texto de la contraseña
+            visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+            // Mejora para accesibilidad en teclados
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            // Icono para cambiar la visibilidad
+            trailingIcon = {
+                val image = if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                val description = if (showPassword) "Ocultar contraseña" else "Mostrar contraseña"
+
+                IconButton(onClick = { showPassword = !showPassword }) {
+                    Icon(imageVector = image, contentDescription = description)
+                }
+            }
         )
 
-        Spacer(
-            modifier = Modifier
-                .height(16.dp)
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = {},
-            modifier = Modifier
-                .fillMaxWidth()
-
+            onClick = { /* TODO: Lógica de inicio de sesión */ },
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = stringResource(R.string.iniciar_sesi_n))
         }
 
-        Spacer(
-            modifier = Modifier
-                .height(32.dp)
-        )
+        Spacer(modifier = Modifier.height(32.dp))
 
-        val textoAnotado = buildAnnotatedString {
+        // --- Texto Clicable para ir al Registro ---
+        val annotatedText = buildAnnotatedString {
             append(stringResource(R.string.no_tienes_cuenta))
-            pushStringAnnotation(tag = "REGISTRATE", annotation = "REGISTRATE")
+            pushLink(
+                LinkAnnotation.Clickable(
+                    tag = "REGISTRO",
+                    linkInteractionListener = { onRegisterClick() } // Llama a la función de navegación
+                )
+            )
             withStyle(
                 style = SpanStyle(
-                    color = Color.Blue,
+                    color = MaterialTheme.colorScheme.primary, // Usa el color del tema
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
@@ -161,16 +144,39 @@ fun login(){
             pop()
         }
 
-        Text(
-            text = textoAnotado,
-        )
-
+        Text(text = annotatedText)
     }
+}
 
+@Composable
+fun RegistroScreen(onBackToLogin: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("Pantalla de Registro", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(32.dp))
+        Button(onClick = onBackToLogin) {
+            Text("Volver al Login")
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun pLogin(){
-    login();
+fun LoginPreview() {
+    PaginasAmarillasTheme {
+        LoginScreen(onRegisterClick = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegistroPreview() {
+    PaginasAmarillasTheme {
+        RegistroScreen(onBackToLogin = {})
+    }
 }
