@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">PaginasAmarillas</string>
+    <string name="correo_electronico">Correo Electrónico</string>
+    <string name="bienvenido_a_p_ginas_amarillas">Bienvenido a Páginas Amarillas</string>
+    <string name="password">Contraseña</string>
+    <string name="iniciar_sesi_n">Iniciar sesión</string>
+    <string name="no_tienes_cuenta">"No tienes cuenta? "</string>
+    <string name="registrate">Registrate</string>
 </resources>
