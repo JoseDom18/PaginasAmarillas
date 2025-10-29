@@ -155,3 +155,16 @@ fun login(){
 fun pLogin(){
     login();
 }
+
+
+@Composable
+fun category(){
+    Text("Hola :c");
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun pCategory(){
+    category();
+}
