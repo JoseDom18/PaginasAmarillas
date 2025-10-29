@@ -30,7 +30,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -97,6 +100,22 @@ fun login(){
         Spacer(
             modifier = Modifier
                 .height(16.dp)
+        )
+
+        val state = remember { TextFieldState() };
+        var showPassword by remember { mutableStateOf(false) };
+
+        BasicSecureTextField(
+            label = {Text(stringResource(id = R.string.password))},
+            state = state,
+            textObfuscationMode =
+                if(showPassword) {
+                    TextObfuscationMode.Visible
+                } else {
+                    TextObfuscationMode.RevealLastTyped
+                },
+            modifier = Modifier
+                .fillMaxWidth()
         )
 
         OutlinedTextField(
